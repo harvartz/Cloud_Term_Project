@@ -33,6 +33,21 @@ def avail_zone():
     print(available_region)
 
 
+### 3. start instance
+def start_instance():
+    print('\n')
+    print('3. start instance \n')
+    print('DESC : Start your instance. \n')
+    instance_id = str(input('Please Enter instance id :'))
+    
+    response = client.start_instances(
+            InstanceIds=[
+                instance_id,
+            ],
+    )
+
+    print(response)
+
 ### #. Main Template
 while True:
 
@@ -60,6 +75,8 @@ while True:
         list_Instances()
     elif number == 2:
         avail_zone()
+    elif number == 3:
+        start_instance()
     elif number == 99:
         print('\n')
         print('Thank you')
