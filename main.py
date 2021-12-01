@@ -1,5 +1,6 @@
 import boto3
 
+### Create Object
 client = boto3.client('ec2')
 ec2 = boto3.resource('ec2')
 instance = ec2.Instance('id')
@@ -7,6 +8,10 @@ instance = ec2.Instance('id')
 
 ### 1. Instance list
 def list_Instances():
+
+    print('\n')
+    print('1. list instance\n')
+    print('DESC : Show your instances\n\n')
     for instance in ec2.instances.all():
         print(
             "Id: {0}\nPlatform: {1}\nType: {2}\nPublic IPv4: {3}\nAMI: {4}\nState: {5}\n".format(
@@ -17,8 +22,18 @@ def list_Instances():
 
 ### 2. available zones
 def avail_zone():
-    for instance in ec2.instances.all():
+    print('\n')
+    print('2. available zones\n')
+    print('DESC : Show your avilable zones\n\n')
+    
+    response = client.describe_regions()
+    print('Regions:', response['Regions'])
+    print('\n\n')
+    available_region = client.describe_availability_zones()
+    print(available_region)
 
+
+### #. Main Template
 while True:
 
     print('                                                  ')
@@ -43,6 +58,8 @@ while True:
 
     if number == 1:
         list_Instances()
+    elif number == 2:
+        avail_zone()
     elif number == 99:
         print('\n')
         print('Thank you')
