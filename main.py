@@ -79,7 +79,7 @@ def create_instance():
     print('6. create instance \n')
     print('DESC : create new instance. \n')
     image_id = str(input('Please Enter ami id:'))
-    create_in = ec2.create_instances(ImageId=image_id, InstanceType='t2.micro', MinCount=1, MaxCount=1)
+    create_in = ec2.create_instances(ImageId=image_id, InstanceType='t2.micro', MinCount=1, MaxCount=1, KeyName='seokjin-test')
     print('Successfully started created EC2 instances {0} based on AMI ID {1}'.format(create_in[0].instance_id, create_in[0].image_id))   
 
 
@@ -104,8 +104,10 @@ def list_images():
     print('8. list images \n')
     print('DESC : Show your list images. \n')
     
-    img = client.describe_images(Owners=['self'])
-    print("ImageId: {0},    Name : {1},     Owner: {2}".format(img['Images'][0]['ImageId'], img['Images'][0]['Name'], img['Images'][0]['OwnerId']))
+    ami_image = client.describe_images(Owners=['self'])
+    for ami in ami_image['Images']:
+        print("ImageId: {0},    Name : {1},     Owner: {2}".format(ami['ImageId'], ami['Name'], ami['OwnerId']))
+
 
 ### 9. terminate instance
 def terminate_instance():
@@ -120,18 +122,58 @@ def terminate_instance():
             ],
     )
 
-    print('Terminating ... {0}'.format(response))
-    print('Successfully terminated instance : {0}'.format()
+    print('Successfully terminated instance : {0}'.format(response['TerminatingInstances'][0]['InstanceId']))
     
-### 10. get public ip
-def get_public_id():
-    print('\n')
-    print('10. Get publicIP Address \n')
-    print('DESC : Get publicip at you instance. \n')
-    for instance in ec2.instances.all():
-        print(
-            "Id: {0}\n Public IPv4: {1}".format(
-            instance.id, instance.public_ip_address))
+### 10. key Pair Info
+#key_pair_info = ec2.KeyPairInfo('name')
+
+def key_pair_info():
+
+    while(True):
+        print('\n')
+        print('10. Key Pair Information \n')
+        print('DESC : Get Key Pair information. \n')
+    
+        print('-----------------------------------------------')
+        print('                                               ')
+        print('         Amazon Key Pair Information           ')
+        print('                                               ')
+        print('         Please Enter Option Number            ')
+        print('-----------------------------------------------')
+        print(' 1. Key Pair Create      2. Key Pair list      ')
+        print(' 3. Delete Key Pair     99. Exit               ')
+        print('                                               ')
+        print('-----------------------------------------------')
+        number2 = int(input('Enter an number:'))
+        
+        def create_key():
+            key_name = str(input('Please enter create Key name :'))
+            keypair = client.create_key_pair(KeyName=key_name)
+
+            print('Success create Key Pair ID : {0}, Name : {1}'.format(keypair['KeyPairId'], keypair['KeyName']))
+
+        def list_key():
+            key_list = client.describe_Key_pairs()
+            for k in key_list['KeyPairs']:
+            print("KeyPairId: {0},    KeyName : {1},    KeyType: {2}".format(k['KeyPairId'], k['KeyName'], k['KeyType']))
+
+            print('list')
+
+        def delete_key():
+            key_name = str(input('Please enter delete Key name : '))
+            response = client.delete_key_pair(KeyName=key_name)
+
+            print('Success delete key {0}'.format(response))
+
+        if number2 ==1 :
+            create_key()
+        elif number2 == 2:
+            list_key()
+        elif number2 == 3:
+            delete_key()
+        elif number2 == 99:
+            break
+
 
 ### 11. create image
 def create_image():
@@ -143,6 +185,8 @@ def create_image():
     client.create_image(InstanceId=instance_id, NoReboot=True, Name=image_name)
     
     print('Create Image Success')
+
+
 
 ### #. Main Template
 while True:
@@ -160,13 +204,13 @@ while True:
     print(' 3. start instance           4. available regions ')
     print(' 5. stop instance            6. create instance   ')
     print(' 7. reboot instance          8. list images       ')
-    print(' 9. terminate instance      10. get publicip      ')   
+    print(' 9. terminate instance      10. key pair info     ')   
     print('11. create image            99. quit              ')
     print('                                                  ')
     print('--------------------------------------------------')
 
 
-    number = int(input("Enter an ingeger: "))
+    number = int(input("Enter an number: "))
 
     if number == 1:
         list_Instances()
@@ -187,7 +231,7 @@ while True:
     elif number == 9:
         terminate_instance()
     elif number == 10:
-        get_public_id()
+        key_pair_info()
     elif number == 11:
         create_image()
     elif number == 99:
