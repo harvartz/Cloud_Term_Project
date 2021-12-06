@@ -61,8 +61,8 @@ def avail_regions():
 ### 5. stop instance
 def stop_instance():
     print('\n')
-    print('3. start instance \n')
-    print('DESC : Start your instance. \n')
+    print('5. stop instance \n')
+    print('DESC : Sto[ your instance. \n')
     instance_id = str(input('Please Enter instance id :'))
     
     response = client.stop_instances(
