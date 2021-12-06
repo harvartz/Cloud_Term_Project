@@ -6,7 +6,6 @@ ec2 = boto3.resource('ec2')
 instance = ec2.Instance('id')
 
 
-
 ### 1. Instance list
 def list_Instances():
 
@@ -15,10 +14,8 @@ def list_Instances():
     print('DESC : Show your instances\n\n')
     for instance in ec2.instances.all():
         print(
-            "Id: {0}\nPlatform: {1}\nType: {2}\nPublic IPv4: {3}\nAMI: {4}\nState: {5}\n".format(
-            instance.id, instance.platform, instance.instance_type, instance.public_ip_address, instance.image.id, instance.state
-             )
-            )
+            "Id: {0}\nPlatform: {1}\nType: {2}\nAMI: {3}\nState: {4}\n".format(
+            instance.id, instance.platform, instance.instance_type, instance.image.id, instance.state))
 
 ### 2. available zones
 def avail_zones():
@@ -31,8 +28,6 @@ def avail_zones():
     for zones in available_zones['AvailabilityZones']:
         print('ID: {0}\nRegion: {1}\nZone: {2}\n\n   '.format(zones['ZoneId'], zones['RegionName'], zones['ZoneName']))
 
-
-#   print('Zones: {0}'.format(available_zones['AvailabilityZones'][0]['ZoneName']))
     print('\n\n')
 
 ### 3. start instance
@@ -84,9 +79,8 @@ def create_instance():
     print('6. create instance \n')
     print('DESC : create new instance. \n')
     image_id = str(input('Please Enter ami id:'))
-    create_in = ec2.create_instances(ImageId=image_id, MinCount=1, MaxCount=5)
-   
-#    print('Successfully started started EC2 instances {0} based on AMI {1}'.format(create_in['SubnetId'] ,create_in['ImageId']))
+    create_in = ec2.create_instances(ImageId=image_id, InstanceType='t2.micro', MinCount=1, MaxCount=1)
+    print('Successfully started created EC2 instances {0} based on AMI ID {1}'.format(create_in[0].instance_id, create_in[0].image_id))   
 
 
 ### 7. reboot instance
@@ -99,7 +93,7 @@ def reboot_instance():
     response = client.reboot_instances(
             InstanceIds=[
                 instance_id,
-                ],
+                ]
             )
     print('Rebooting ... {0}'.format(instance_id))
     print('Sccessfully rebooted instance : {0}'.format(instance_id))
@@ -111,7 +105,6 @@ def list_images():
     print('DESC : Show your list images. \n')
     
     img = client.describe_images(Owners=['self'])
-
     print("ImageId: {0},    Name : {1},     Owner: {2}".format(img['Images'][0]['ImageId'], img['Images'][0]['Name'], img['Images'][0]['OwnerId']))
 
 ### 9. terminate instance
@@ -127,17 +120,29 @@ def terminate_instance():
             ],
     )
 
-    print(response)
+    print('Terminating ... {0}'.format(response))
+    print('Successfully terminated instance : {0}'.format()
     
-### 10. reload instance
-def reload_instance():
+### 10. get public ip
+def get_public_id():
     print('\n')
-    print('10. reload instance \n')
-    print('DESC : Reload you instance. \n')
+    print('10. Get publicIP Address \n')
+    print('DESC : Get publicip at you instance. \n')
+    for instance in ec2.instances.all():
+        print(
+            "Id: {0}\n Public IPv4: {1}".format(
+            instance.id, instance.public_ip_address))
+
+### 11. create image
+def create_image():
+    print('\n')
+    print('12. create image \n')
+    print('DESC : create image. \n')
     instance_id = str(input('Please Enter instance id :'))
+    image_name = str(input('Please Enter image name (more than 3 letters): '))
+    client.create_image(InstanceId=instance_id, NoReboot=True, Name=image_name)
     
-    
- 
+    print('Create Image Success')
 
 ### #. Main Template
 while True:
@@ -155,8 +160,8 @@ while True:
     print(' 3. start instance           4. available regions ')
     print(' 5. stop instance            6. create instance   ')
     print(' 7. reboot instance          8. list images       ')
-    print(' 9. terminate instance      10. reload instance   ')
-    print('                            99. quit              ')
+    print(' 9. terminate instance      10. get publicip      ')   
+    print('11. create image            99. quit              ')
     print('                                                  ')
     print('--------------------------------------------------')
 
@@ -182,7 +187,9 @@ while True:
     elif number == 9:
         terminate_instance()
     elif number == 10:
-        reload_instance()
+        get_public_id()
+    elif number == 11:
+        create_image()
     elif number == 99:
         print('\n')
         print('Thank you')
