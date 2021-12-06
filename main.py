@@ -79,7 +79,8 @@ def create_instance():
     print('6. create instance \n')
     print('DESC : create new instance. \n')
     image_id = str(input('Please Enter ami id:'))
-    create_in = ec2.create_instances(ImageId=image_id, InstanceType='t2.micro', MinCount=1, MaxCount=1, KeyName='seokjin-test')
+    k_name = str(input('Please Enter Keyname:'))
+    create_in = ec2.create_instances(ImageId=image_id, InstanceType='t2.micro', MinCount=1, MaxCount=1, KeyName=k_name)
     print('Successfully started created EC2 instances {0} based on AMI ID {1}'.format(create_in[0].instance_id, create_in[0].image_id))   
 
 
@@ -125,7 +126,6 @@ def terminate_instance():
     print('Successfully terminated instance : {0}'.format(response['TerminatingInstances'][0]['InstanceId']))
     
 ### 10. key Pair Info
-#key_pair_info = ec2.KeyPairInfo('name')
 
 def key_pair_info():
 
@@ -146,18 +146,21 @@ def key_pair_info():
         print('-----------------------------------------------')
         number2 = int(input('Enter an number:'))
         
+### Create Key
         def create_key():
             key_name = str(input('Please enter create Key name :'))
             keypair = client.create_key_pair(KeyName=key_name)
 
             print('Success create Key Pair ID : {0}, Name : {1}'.format(keypair['KeyPairId'], keypair['KeyName']))
 
+### List Key
         def list_key():
-            key_list = client.describe_Key_pairs()
+            key_list = client.describe_key_pairs()
             for k in key_list['KeyPairs']:
-            print("KeyPairId: {0},    KeyName : {1},    KeyType: {2}".format(k['KeyPairId'], k['KeyName'], k['KeyType']))
+                print("KeyPairId: {0},    KeyName : {1},    KeyType: {2}".format(k['KeyPairId'], k['KeyName'], k['KeyType']))
 
-            print('list')
+
+### Delete Key
 
         def delete_key():
             key_name = str(input('Please enter delete Key name : '))
